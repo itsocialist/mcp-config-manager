@@ -51,16 +51,17 @@ const createWindow = (): void => {
     console.log('[Main] process.resourcesPath:', process.resourcesPath)
     console.log('[Main] App path:', app.getAppPath())
     
-    // Load directly from the path relative to the ASAR root
-    // When in ASAR, just use the relative path within the archive
-    mainWindow.loadFile('dist/renderer/index.html').catch(async error => {
+    // Load the renderer HTML file
+    // In production, __dirname is dist/main, so renderer is at ../renderer
+    const indexPath = join(__dirname, '../renderer/index.html')
+    mainWindow.loadFile(indexPath).catch(async error => {
       console.error('[Main] Primary path failed:', error)
       
       // Fallback paths if the primary doesn't work
       const fallbackPaths = [
-        join(__dirname, '../../../renderer/index.html'), // Relative from main.js
-        join(__dirname, '../../renderer/index.html'), // Alternative relative path
+        'dist/renderer/index.html', // For packaged app
         join(process.resourcesPath, 'app.asar/dist/renderer/index.html'), // Direct ASAR path
+        join(__dirname, '../../dist/renderer/index.html'), // Alternative path
       ]
       
       let loaded = false
